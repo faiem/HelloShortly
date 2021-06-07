@@ -1,3 +1,7 @@
+using HelloShortly.UrlDistributerRestApi.ConcurrentQ;
+using HelloShortly.UrlDistributerRestApi.Data.Repositories;
+using HelloShortly.UrlDistributerRestApi.Services;
+using HelloShortly.UrlDistributerRestApi.ShortAliasesHelper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -6,7 +10,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using StackExchange.Redis;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -27,6 +33,15 @@ namespace HelloShortly.UrlDistributerRestApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            services.AddSingleton<IConnectionMultiplexer>(x =>
+                ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable("RedisConnection")));
+            services.AddScoped<IShortUrlRepository, ShortUrlRepository>();
+            services.AddScoped<IShortUrlService, ShortUrlService>();
+            services.AddSingleton<ConcurrentQueue>();
+            services.AddScoped<IBase62Generator, Base62Generator>();
+            services.AddScoped<ICacheService, RedisCacheService>();
+            services.AddHttpClient();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -55,7 +70,7 @@ namespace HelloShortly.UrlDistributerRestApi
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "HelloShortly.UrlDistributerRestApi v1");
-                c.RoutePrefix = string.Empty;
+                //c.RoutePrefix = string.Empty;
             });
 
             app.UseRouting();

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace HelloShortly.UrlDistributerRestApi.ShortAliasesHelper
 {
-    public class Base62Generator
+    public class Base62Generator : IBase62Generator
     {
         private readonly string keyElements = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         private readonly long Base = 62;
