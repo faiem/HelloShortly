@@ -1,4 +1,5 @@
 using HelloShortly.KMM.RestApi.Data.Repositories;
+using HelloShortly.KMM.RestApi.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -28,6 +29,7 @@ namespace HelloShortly.KMM.RestApi
         {
             services.AddScoped<IRepository, Repository>();
             services.AddScoped<IKeyRangeRepository, KeyRangeRepository>();
+            services.AddScoped<IKeyRangeProviderService, IKeyRangeProviderService>();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
