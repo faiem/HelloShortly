@@ -35,7 +35,7 @@ namespace HelloShortly.UrlDistributerRestApi
         {
 
             services.AddSingleton<IConnectionMultiplexer>(x =>
-                ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable("RedisConnection")));
+                ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable("REDIS_CONN")));
             services.AddScoped<IShortUrlRepository, ShortUrlRepository>();
             services.AddScoped<IShortUrlService, ShortUrlService>();
             services.AddSingleton<ConcurrentQueue>();
@@ -61,7 +61,7 @@ namespace HelloShortly.UrlDistributerRestApi
             {
                 app.UseDeveloperExceptionPage();
             }
-            
+
             app.UseSwagger(c =>
             {
                 c.SerializeAsV2 = true;

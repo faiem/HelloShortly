@@ -24,7 +24,15 @@
       "launchUrl": "swagger",
       "applicationUrl": "http://localhost:5000",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_LOG_HOST": "http://seq:5341",
+        "KEY_RANGE_GET_API": "http://localhost:4000/KeyRanges",
+        "MONGO_CONN": "",
+        "MONGO_DB_NAME": "",
+        "Mongo_COLLECTION_NAME": "",
+        "REDIS_CONN": "localhost:6379",
+        "LOAD_BALANCER": "http://localhost:8080/"
+
       }
     }
   }

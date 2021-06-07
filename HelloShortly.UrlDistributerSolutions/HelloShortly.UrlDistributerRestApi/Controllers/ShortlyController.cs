@@ -36,7 +36,7 @@ namespace HelloShortly.UrlDistributerRestApi.Controllers
         /// <param name="aliases"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        [HttpGet("{aliases}", Name = nameof(RetriveLongUrl))]
+        [HttpGet("/{aliases}", Name = nameof(RetriveLongUrl))]
         [SwaggerResponse(200, "Retrive the long url.")]
         [SwaggerResponse(400, "Bad Request for invalid aliases.")]
         public async Task<IActionResult> RetriveLongUrl([FromRoute] string aliases, CancellationToken ct)
@@ -101,7 +101,7 @@ namespace HelloShortly.UrlDistributerRestApi.Controllers
 
             //Add to cache
             await _cacheService.SetCacheValueAsync(shortUrlResponse.ShortUrlAliases, shortUrlResponse.LongUrl);
-            return StatusCode(201);
+            return StatusCode(201, shortUrlResponse.ShortUrl);
         }
     }
 }

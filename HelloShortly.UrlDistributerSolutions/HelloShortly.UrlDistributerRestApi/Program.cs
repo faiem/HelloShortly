@@ -1,5 +1,7 @@
+using HelloShortly.UrlDistributerRestApi.BackgroundServices;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -29,6 +31,7 @@ namespace HelloShortly.UrlDistributerRestApi
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                }).UseSerilog();
+                }).ConfigureServices(s=>s.AddHostedService<KeyRangeUpdateService>())
+            .UseSerilog();
     }
 }

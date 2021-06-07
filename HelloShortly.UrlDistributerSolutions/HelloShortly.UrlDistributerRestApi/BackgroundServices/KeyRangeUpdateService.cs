@@ -1,5 +1,6 @@
 ﻿using HelloShortly.UrlDistributerRestApi.ConcurrentQ;
 using HelloShortly.UrlDistributerRestApi.Dtos.Responses;
+using HelloShortly.UrlDistributerRestApi.Services;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
@@ -29,7 +30,7 @@ namespace HelloShortly.UrlDistributerRestApi.BackgroundServices
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation($"Background Task has started, UTC Time: {DateTime.UtcNow}"); ;
-
+            
             while (!stoppingToken.IsCancellationRequested)
             {
 
@@ -50,7 +51,7 @@ namespace HelloShortly.UrlDistributerRestApi.BackgroundServices
 
                             var res = await JsonSerializer.DeserializeAsync<KeyRangeResponse>(responseStream);
                             _logger.LogInformation($"Key Ranges are {res.start_range} {res.end_range}");
-
+                           
                             for (long I = res.start_range; I <= res.end_range; I++)
                             {
                                 _concurrentQueue.Write(I);

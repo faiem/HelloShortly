@@ -23,7 +23,7 @@ namespace HelloShortly.KMM.RestApi.Controllers
         /// </summary>
         /// <returns></returns>
         [ProducesResponseType(typeof(KeyRangeResponseDto), 200)]
-        [HttpGet("GetUniqueKeyRange")]
+        [HttpGet(Name = nameof(GetUniqueKeyRange))]
         public IActionResult GetUniqueKeyRange()
         {
             KeyRangeResponseDto response = _keyRangeProviderService.GetUniqueKeyRange();
