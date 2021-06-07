@@ -1,0 +1,45 @@
+﻿using Dapper;
+using HelloShortly.KMM.RestApi.Data.Entities;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace HelloShortly.KMM.RestApi.Data.Repositories
+{
+    public class KeyRangeRepository : Repository, IKeyRangeRepository
+    {
+        private ILogger<KeyRangeRepository> _logger;
+        public KeyRangeRepository(ILogger<KeyRangeRepository> logger)
+        {
+            _logger = logger;
+        }
+
+        public keyRange GetUniqueKeyRangeByIdentifier(string identifier)
+        {
+            string query = "select * from keyranges where retrieve_key = @r_key";
+
+            var dbPara = new DynamicParameters();
+            dbPara.Add("r_key", identifier);
+
+            var keyRange = Get<keyRange>(query, dbPara, CommandType.Text);
+
+            return keyRange;
+        }
+
+        public int UpdateKeyRangeWithUniqueIdentifier(string identifier)
+        {
+            var dbPara = new DynamicParameters();
+            dbPara.Add("r_key", identifier);
+            dbPara.Add("r_time", DateTime.UtcNow, DbType.DateTime);
+
+            string update_query = "UPDATE keyranges SET is_retrieved = true, retrieve_key = @r_key, retrieved_time=@r_time WHERE CTID IN(SELECT CTID FROM keyranges WHERE is_retrieved = false and retrieve_key IS NULL LIMIT 1)";
+
+            int updateRowCount = Update<int>(update_query, dbPara, CommandType.Text);
+
+            return updateRowCount;
+        }
+    }
+}
