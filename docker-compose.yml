@@ -1,12 +1,29 @@
 version: '3'
 
 services:
-  key-range-provider:
-    container_name: key_provider_service
-    ports:
-      - 8080:80
-    environment:
-      - "ASPNETCORE_DB_CONN=Host=postgresql-master;Port=5432;User Id=my_user;Password=my_password;Database=my_database;Pooling=true;"
-    build:
-      context: ./HelloShortly.KeyManagementSolutions/HelloShortly.KMM.RestApi/
-    restart: on-failure 
+
+    key-range-provider:
+        container_name: key_provider_service
+        ports:
+            - 8080:80
+        environment:
+            - "ASPNETCORE_LOG_HOST=http://seq:5341"
+            - "ASPNETCORE_DB_CONN=Host=postgresql-master;Port=5432;User Id=my_user;Password=my_password;Database=my_database;Pooling=true;"
+        build: ./HelloShortly.KeyManagementSolutions/HelloShortly.KMM.RestApi/
+        restart: on-failure
+        links:
+            - seq
+    
+    seq:
+        image: datalust/seq:latest
+        ports:
+            - 5341:80
+        environment: 
+            ACCEPT_EULA: Y
+        restart: unless-stopped
+        volumes: 
+            - ./seq-data:/data 
+        
+    
+
+  
