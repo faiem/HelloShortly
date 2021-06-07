@@ -46,6 +46,11 @@ namespace HelloShortly.UrlDistributerRestApi.Services
 
             shortAliases = _base62Generator.Encode(unique_number);
 
+            if (string.IsNullOrEmpty(customHostedName))
+            {
+                customHostedName = Environment.GetEnvironmentVariable("LB_URL");
+            }
+
             ShortUrl su = new()
             {
                 CreatedAt = DateTime.UtcNow,
