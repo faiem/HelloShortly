@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  key-range-provider:
+    container_name: key_provider_service
+    ports:
+      - 8080:80
+    environment:
+      - "ASPNETCORE_DB_CONN=Host=postgresql-master;Port=5432;User Id=my_user;Password=my_password;Database=my_database;Pooling=true;"
+    build:
+      context: ./HelloShortly.KeyManagementSolutions/HelloShortly.KMM.RestApi/
+    restart: on-failure 
