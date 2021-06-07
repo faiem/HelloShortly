@@ -12,7 +12,7 @@ services:
         restart: unless-stopped
         volumes: 
             - ./seq-data:/data 
-
+    
     postgresql-master:
         image: 'bitnami/postgresql:latest'
         restart: 'on-failure'
