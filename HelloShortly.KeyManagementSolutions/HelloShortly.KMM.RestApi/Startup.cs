@@ -29,7 +29,7 @@ namespace HelloShortly.KMM.RestApi
         {
             services.AddScoped<IRepository, Repository>();
             services.AddScoped<IKeyRangeRepository, KeyRangeRepository>();
-            services.AddScoped<IKeyRangeProviderService, IKeyRangeProviderService>();
+            services.AddScoped<IKeyRangeProviderService, KeyRangeProviderService>();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {

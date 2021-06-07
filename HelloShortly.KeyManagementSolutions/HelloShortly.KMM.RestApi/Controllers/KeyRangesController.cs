@@ -27,12 +27,7 @@ namespace HelloShortly.KMM.RestApi.Controllers
         public IActionResult GetUniqueKeyRange()
         {
             KeyRangeResponseDto response = _keyRangeProviderService.GetUniqueKeyRange();
-
-            if (response.range_id == -1)
-            {
-                //Send notification to admin to inform that all of the key ranges are finished.
-            }
-
+            
             return Ok(response);
         }
     }

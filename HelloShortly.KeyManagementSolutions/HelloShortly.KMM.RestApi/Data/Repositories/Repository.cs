@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Microsoft.Extensions.Logging;
 using Npgsql;
 using System;
 using System.Collections.Generic;
@@ -11,9 +12,11 @@ namespace HelloShortly.KMM.RestApi.Data.Repositories
 {
     public class Repository : IRepository
     {
+        
         private string _connectionstring = "DefaultConnection";
         public Repository()
         {
+            
             _connectionstring = Environment.GetEnvironmentVariable("ASPNETCORE_DB_CONN");
         }
 
@@ -75,6 +78,8 @@ namespace HelloShortly.KMM.RestApi.Data.Repositories
 
         public T Update<T>(string sp, DynamicParameters parms, CommandType commandType = CommandType.StoredProcedure)
         {
+
+
             T result;
             using IDbConnection db = new NpgsqlConnection(_connectionstring);
             try
