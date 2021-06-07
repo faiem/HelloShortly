@@ -13,19 +13,6 @@ services:
         volumes: 
             - ./seq-data:/data 
 
-    key-range-provider:
-        container_name: key_provider_service
-        ports:
-            - 8080:80
-        environment:
-            - "ASPNETCORE_LOG_HOST=http://seq:5341"
-            - "ASPNETCORE_DB_CONN=Host=postgresql-master;Port=5432;User Id=my_user;Password=my_password;Database=my_database;Pooling=true;"
-        build: ./HelloShortly.KeyManagementSolutions/HelloShortly.KMM.RestApi/
-        restart: on-failure
-        links:
-            - seq
-            - postgresql-master
-
     postgresql-master:
         image: 'bitnami/postgresql:latest'
         restart: 'on-failure'
@@ -55,7 +42,29 @@ services:
         - POSTGRESQL_REPLICATION_PASSWORD=repl_password
         - POSTGRESQL_MASTER_HOST=postgresql-master
         - POSTGRESQL_PASSWORD=my_password
-        - POSTGRESQL_MASTER_PORT_NUMBER=5432    
+        - POSTGRESQL_MASTER_PORT_NUMBER=5432  
+    
+    key-range-provider:
+        environment:
+            - "ASPNETCORE_LOG_HOST=http://seq:5341"
+            - "ASPNETCORE_DB_CONN=Host=postgresql-master;Port=5432;User Id=my_user;Password=my_password;Database=my_database;Pooling=true;"
+        build: ./HelloShortly.KeyManagementSolutions/HelloShortly.KMM.RestApi/
+        restart: on-failure
+        expose: 
+            - "80"
+        links:
+            - seq
+            - postgresql-master   
+            
+    #Load balancer for Key Range Service Provider
+    nginx:
+        image: nginx:latest
+        volumes:
+          - ./KeyRangeServiceLoadBalancerConfig/nginx.conf:/etc/nginx/nginx.conf:ro
+        depends_on:
+          - key-range-provider
+        ports:
+          - "4000:4000" 
 
     
     
