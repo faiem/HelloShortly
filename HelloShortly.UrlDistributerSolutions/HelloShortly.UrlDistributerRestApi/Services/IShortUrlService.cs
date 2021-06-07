@@ -9,7 +9,7 @@ namespace HelloShortly.UrlDistributerRestApi.Services
 {
     public interface IShortUrlService
     {
-        Task<ShortUrlResponse> GenerateShortUrl(string uri, CancellationToken ct = default);
+        Task<ShortUrlResponse> GenerateShortUrl(string uri, string customHostName, CancellationToken ct = default);
         string GetLongUrl(string aliases);
     }
 }

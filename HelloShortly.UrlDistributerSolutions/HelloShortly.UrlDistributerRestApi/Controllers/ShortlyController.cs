@@ -58,7 +58,7 @@ namespace HelloShortly.UrlDistributerRestApi.Controllers
             //encoded the url for storing
             string uri = UriHelper.Encode(new Uri(addLongUrlForm.LongUrl));
 
-            var shortUrlResponse = await _shortUrlService.GenerateShortUrl(uri, ct);
+            var shortUrlResponse = await _shortUrlService.GenerateShortUrl(uri, addLongUrlForm.CustomShortUrlHost, ct);
 
             //Add to cache
             await _cacheService.SetCacheValueAsync(shortUrlResponse.ShortUrlAliases, shortUrlResponse.LongUrl);

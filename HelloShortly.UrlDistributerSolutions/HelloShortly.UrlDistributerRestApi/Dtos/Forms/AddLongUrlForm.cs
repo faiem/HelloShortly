@@ -16,10 +16,10 @@ namespace HelloShortly.UrlDistributerRestApi.Dtos.Forms
         public string LongUrl { get; set; }
 
         /// <summary>
-        /// If user wants to serve the short url with custom hosting. It's 
-        /// optional.
+        /// If user wants to serve the short url with custom hosting.  
+        /// This feature is optional.
         /// </summary>
-        [DefaultValue("http://localhost:5900/")]
-        public string ShortUrlHost { get; set; }
+        [DefaultValue(null)]
+        public string CustomShortUrlHost { get; set; }
     }
 }
