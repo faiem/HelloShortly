@@ -21,5 +21,7 @@ namespace HelloShortly.UrlDistributerRestApi.Data.Entities
         public string UserId { get; set; }
 
         public DateTime CreatedAt { get; set; }
+
+        public DateTime ExpirationAt { get; set; }
     }
 }
