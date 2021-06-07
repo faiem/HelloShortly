@@ -27,6 +27,7 @@ namespace HelloShortly.KMM.RestApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<IRepository, Repository>();
+            services.AddScoped<IKeyRangeRepository, KeyRangeRepository>();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
