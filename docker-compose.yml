@@ -2,6 +2,17 @@ version: '3'
 
 services:
 
+    #Centralized Log Management
+    seq:
+        image: datalust/seq:latest
+        ports:
+            - 5341:80
+        environment: 
+            ACCEPT_EULA: Y
+        restart: unless-stopped
+        volumes: 
+            - ./seq-data:/data 
+
     key-range-provider:
         container_name: key_provider_service
         ports:
@@ -14,15 +25,7 @@ services:
         links:
             - seq
     
-    seq:
-        image: datalust/seq:latest
-        ports:
-            - 5341:80
-        environment: 
-            ACCEPT_EULA: Y
-        restart: unless-stopped
-        volumes: 
-            - ./seq-data:/data 
+    
         
     
 
