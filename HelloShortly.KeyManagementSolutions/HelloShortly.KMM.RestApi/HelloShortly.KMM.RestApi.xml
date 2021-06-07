@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>HelloShortly.KMM.RestApi</name>
+    </assembly>
+    <members>
+        <member name="M:HelloShortly.KMM.RestApi.Controllers.KeyRangesController.GetUniqueKeyRange">
+            <summary>
+            It provides unique Key Ranges to the consumer.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:HelloShortly.KMM.RestApi.Data.Entities.keyRange.key_ranges_id">
+            <summary>
+            Primary Key
+            </summary>
+        </member>
+        <member name="P:HelloShortly.KMM.RestApi.Data.Entities.keyRange.is_retrieved">
+            <summary>
+            Default value : false
+            SET to true while updating for retrieval.
+            </summary>
+        </member>
+        <member name="P:HelloShortly.KMM.RestApi.Data.Entities.keyRange.retrieve_key">
+            <summary>
+            Default value : null
+            SET to unique identifier while updating for retrieval.
+            </summary>
+        </member>
+        <member name="P:HelloShortly.KMM.RestApi.Data.Entities.keyRange.retrieved_time">
+            <summary>
+            Default value : null
+            SET to current UTC time while updating for retrieval.
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -20,7 +20,7 @@ namespace HelloShortly.KMM.RestApi
                 .WriteTo.Console()
                 .WriteTo.Seq(Environment.GetEnvironmentVariable("ASPNETCORE_LOG_HOST"))
                 .CreateLogger();
-                                
+
             CreateHostBuilder(args).Build().Run();
         }
 
