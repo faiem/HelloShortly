@@ -15,7 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Data\Settings\" />
     <Folder Include="Dtos\Forms\" />
   </ItemGroup>
 
