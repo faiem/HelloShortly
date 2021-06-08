@@ -39,9 +39,18 @@ There responsibilities are very simple. let's discuss about that.
 - start_range = range start point
 - end_range = range end point
 
+The difference between end_range and start_range is 1 Million.
+
 This service never duplicates the same range, that means it never gonna provide response with same range to multiple consumers. That's the beauty of this service. 
 
-2. Url distribution service: 
+Service-1 High Level Architecture: http://localhost:4000
+
+![service_1_high_level_architecture](https://user-images.githubusercontent.com/5144847/121199312-adcb6580-c827-11eb-8fe9-980e24cdd1e5.png)
+
+
+
+2. **Url distribution service:** This service has only url distribution responsibility, either it could be after converting short to long or long to short url. It has a background service that pull key ranges from Key Range Provider Service and store that in a concurrent queue and check every 5 sec that if the queue has enough items. While monitoring if it find that queue is empty then the background service pulls another set of key range and enque the concurrent queue. When user comes to convert a long url to short that time rest api safely deque an item from the concurrent queue and generates an unique url and provides to user. The concurrent queue ensure that every long to short url request on server get the unique value. 
+
 
 
 
