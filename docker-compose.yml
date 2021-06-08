@@ -83,12 +83,8 @@ services:
         image: mongo:4.0-xenial
         expose:
             - 27017
-        ports:
-            - 27011:27017
-        restart: unless-stopped
+        restart: always
         entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
-        networks:
-            - my-network
 
     mongo2:
         hostname: mongo2
@@ -96,12 +92,8 @@ services:
         image: mongo:4.0-xenial
         expose:
             - 27017
-        ports:
-            - 27012:27017
-        restart: unless-stopped
+        restart: always
         entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
-        networks:
-            - my-network
 
     mongo3:
         hostname: mongo3
@@ -109,13 +101,20 @@ services:
         image: mongo:4.0-xenial
         expose:
             - 27017
-        ports:
-            - 27013:27017
-        restart: unless-stopped
+        restart: always
         entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
-        networks:
-            - my-network
-    
+
+    mongosetup:
+        image: mongo:4.0-xenial
+        depends_on:
+            - mongo1
+            - mongo2
+            - mongo3
+        volumes:
+            - ./MongoClusterConfig/mongo_setup.sh:/etc/scripts
+        restart: "no"
+        entrypoint: [ "bash", "/etc/scripts/mongo_setup.sh"]
+
     redis-master:
         hostname: redis-master
         image: bitnami/redis:latest
@@ -138,23 +137,27 @@ services:
         environment:
             - "ASPNETCORE_LOG_HOST=http://seq:5341"
             - "KEY_RANGE_GET_API=http://nginx:4000/KeyRanges"
-            - "MONGO_CONN=mongodb://mongo1:27011/short_urls"
+            - "MONGO_CONN=mongodb://localmongo1,localmongo2,localmongo3/short_urls?replicaSet=rs0"
             - "MONGO_DB_NAME=short_urls"
             - "Mongo_COLLECTION_NAME=urls"
             - "REDIS_CONN=redis-master:6379" 
             - "LOAD_BALANCER=http://localhost:5050/"
         depends_on:
             - seq
-            - mongo1
             - redis-master
             - nginx
         networks:
             - my-network
+        external_links:
+            - "localmongo1:mongo1"
+            - "localmongo2:mongo2"
+            - "localmongo3:mongo3"
 
 networks:
     my-network:
-        #driver: bridge
+        driver: bridge
         external: true
+    
             
 
 
