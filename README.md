@@ -60,15 +60,11 @@ The URL distribution service has a background service that pulls key ranges from
 Now, let's talk about the read data or short to long conversion process. In this process, a user provides our server generated short URL and expects the original long URL. After receiving the short URL from the user, the service first searches the cache for the long URL. If found, then it returns the long URL from there. Otherwise, it searches the MongoDB storage and returns if found. If not found, then the service declares that the short aliase was not produced by our system.
 
 
-High Level Architecture for Service-2: http://localhost:5000
-
-![service_2_HLA](https://user-images.githubusercontent.com/5144847/121208879-41546480-c82f-11eb-8736-05db6054dd44.png)
+High Level Architecture for Service-2: http://localhost:5000/swagger
 
 
 
-
-
-
+![service_2_HLA_2](https://user-images.githubusercontent.com/5144847/121219859-f5a6b880-c838-11eb-9a5f-5d024a75009a.png)
 
 
 
