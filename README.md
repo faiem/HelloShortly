@@ -7,29 +7,28 @@ This service must be capable of handling immense scale for both creation of new 
 
 # Solutions:
 
-There are several sub problems inside of that above described problem. The challenges are:
+There are several sub problems inside of the above described problem. The challenges are:
 
-1. We need to use unique set of characters as aliases to keep each short url unique. For example: For a long url if the short url is http://t.co/abf then "abf" represents the aliases of the url. 
-2. Url's aliases size should be maintain as low as possible.
-3. Have to find a way to generate and distribute the unique alieases fast.
-4. Site traffic would be very high.
+1. We need to use unique set of characters as aliases to keep each short URL unique. For example, for a long URL, if the short URL is http://t.co/abf then "abf" represents the alias of the URL. 
+2. URL's aliases size should be as low as possible.
+3. Have to find a way to generate and distribute the unique aliases fast.
+4. Site traffic will be very high.
 
 **Solution for 1 and 2:**
-This problem could be easily solve by generating 62 base numbers. We have 26 lowercase letter[a-z], 26 uppercase letters[A-Z] and 10 numbers[0-9]. If we could represent 62 (26+26+10) base number by using them then for length 7, we could generate 62^7 = 3521614606208 numbers of unique combinations. If our system could convert
-200 long urls to short urls per second then it will take more than 500 years to reach length 8. So I think it's one of the best way to keep the url's aliases short as well as unique.
+These problems could be easily solved by generating 62 base numbers. We have 26 lowercase letter[a-z], 26 uppercase letters[A-Z], and 10 numbers[0-9]. If we could represent 62 (26+26+10) base number by using the letters and numbers, then for length 7, we could generate 62^7 = 3521614606208 numbers of unique combinations. If our system could convert 200 long URLs to short URLs per second, then it will take more than 500 years to reach length 8. So, I think this is one of the best ways to keep the URL's aliases short as well as unique.
 
-**Solution for number 3:**
+**Solution for 3:**
 
-Our system would be read heavy, means there would be a lot people use our site for converting long url to short url instead of generating short from a long one, per second. I keep that thing in my mind while designing the solutions. 
+Our system will be read heavy, which means a lot of users will be using our site for converting short URL to long URL (read) instead of generating short from a long one (write) per second. I kept this in my mind while designing the solution. 
 
-I divided the whole solutions in 2 parts and created two microservices for that. They are:
+I divided the whole solution into two parts and created two microservices. They are:
 
 1. key-range-provider service
-2. url_distributer service
+2. url_distributor service
 
-There responsibilities are very simple. let's discuss about that.
+Their responsibilities are very simple. Let's discuss about that.
 
-1. Key Range provider service: It's a rest api. It has only one GET endpoint. If any consumer request that endpoint it provides a range of two numbers. For example: let's have a look on the service's a sample GET json response,
+1. Key range provider service: This is a rest api. It has only one GET endpoint. If any consumer requests through that endpoint, it provides a range of two numbers. For example, let's have a look on a sample GET json response of the service,
 
 {
     "range_id": 29,
@@ -37,13 +36,12 @@ There responsibilities are very simple. let's discuss about that.
     "end_range": 10000000
 }
 
-
-- start_range = range start point
-- end_range = range end point
+where, start_range = range start point
+and end_range = range end point
 
 The difference between end_range and start_range is 1 Million.
 
-This service never duplicates the same range, that means it never gonna provide response with same range to multiple consumers. That's the beauty of this service. 
+This service never duplicates a range, that means it will never provide response with the same range to multiple consumers. That is the beauty of this service. 
 
 Service-1 High Level Architecture: http://localhost:4000
 
@@ -54,13 +52,13 @@ Service-1 High Level Architecture: http://localhost:4000
 
 
 
-2. **Url distribution service:** 
+2. **URL distributor service:** 
 
-This service has only url distribution responsibility, either it could be after converting short to long or long to short url. let's talk about long to short url conversion process first, this process represents about write data. 
+This service has only one responsibility, URL distribution. It could either be after converting short to long or long to short URL. Let's talk about the long to short URL conversion process first. This process represents writing data.
 
-The Url distribution service has a background service that pulls key ranges from "Key Range Provider Service" and store that in a concurrent queue and check every 5 sec that if the queue has enough items or not. While monitoring if it's find that, the queue is empty then the background service pulls another set of key range and enque the concurrent queue. When user comes to convert a long url to short that time rest api safely deque an item from the concurrent queue and generates an unique url and provides to user. The concurrent queue ensure that every long to short url request on server gets the unique value for url aliases. We stored a copy to our Mongo Db data storage for future read operations. Moreover after converting long to short url, the service store that output to a cache server, so the read operation could find and serve it fast.
+The URL distribution service has a background service that pulls key ranges from the "Key Range Provider Service" and stores that in a concurrent queue. It checks the queue every 5 sec to see if it has enough items or not. While monitoring, if it finds that the queue is empty, then the background service pulls another set of key range and enques the concurrent queue. When a user comes to convert a long URL to short, that time the rest api safely deques an item from the concurrent queue, generates a unique URL, and provides it to the user. The concurrent queue ensures that every long to short URL request on the server gets a unique value for the URL aliases. The service stores the data to a MongoDB data storage as well as a Redis cache server, so that the read operations could find and serve the data faster.
 
-Now let talk about read data or short to long conversion process. In this process user provides our server generated short url and expect the original long url. After receiving the short url from user, service first check to the cache, if it found that in there then return the long url from there. But if the service does not get it on cache server then it will check the Mongo DB storage, if found then return it otherwise declare that the short aliases was not produced by our system.
+Now, let's talk about the read data or short to long conversion process. In this process, a user provides our server generated short URL and expects the original long URL. After receiving the short URL from the user, the service first searches the cache for the long URL. If found, then it returns the long URL from there. Otherwise, it searches the MongoDB storage and returns if found. If not found, then the service declares that the short aliase was not produced by our system.
 
 
 Service-2 High Level Architecture: http://localhost:5000
