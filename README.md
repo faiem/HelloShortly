@@ -18,7 +18,6 @@ There are several sub problems inside of the above described problem. The challe
 These problems could be easily solved by generating 62 base numbers. We have 26 lowercase letter[a-z], 26 uppercase letters[A-Z], and 10 numbers[0-9]. If we could represent 62 (26+26+10) base number by using the letters and numbers, then for length 7, we could generate 62^7 = 3521614606208 numbers of unique combinations. If our system could convert 200 long URLs to short URLs per second, then it will take more than 500 years to reach length 8. So, I think this is one of the best ways to keep the URL's aliases short as well as unique.
 
 **Solution for 3:**
-
 Our system will be read heavy, which means a lot of users will be using our site for converting short URL to long URL (read) instead of generating short from a long one (write) per second. I kept this in my mind while designing the solution. 
 
 I divided the whole solution into two parts and created two microservices. They are:
@@ -39,11 +38,11 @@ Their responsibilities are very simple. Let's discuss about that.
 where, start_range = range start point
 and end_range = range end point
 
-The difference between end_range and start_range is 1 Million.
+The difference between end_range and start_range is 1 million.
 
 This service never duplicates a range, that means it will never provide response with the same range to multiple consumers. That is the beauty of this service. 
 
-Service-1 High Level Architecture: http://localhost:4000
+High Level Architecture for Service-1: http://localhost:4000
 
 ![service_1_high_level_architecture](https://user-images.githubusercontent.com/5144847/121199312-adcb6580-c827-11eb-8fe9-980e24cdd1e5.png)
 
@@ -61,7 +60,7 @@ The URL distribution service has a background service that pulls key ranges from
 Now, let's talk about the read data or short to long conversion process. In this process, a user provides our server generated short URL and expects the original long URL. After receiving the short URL from the user, the service first searches the cache for the long URL. If found, then it returns the long URL from there. Otherwise, it searches the MongoDB storage and returns if found. If not found, then the service declares that the short aliase was not produced by our system.
 
 
-Service-2 High Level Architecture: http://localhost:5000
+High Level Architecture for Service-2: http://localhost:5000
 
 ![service_2_HLA](https://user-images.githubusercontent.com/5144847/121208879-41546480-c82f-11eb-8736-05db6054dd44.png)
 
