@@ -19,6 +19,7 @@ This problem could be easily solve by generating 62 base numbers. We have 26 low
 200 long urls to short urls per second then it will take more than 500 years to reach length 8. So I think it's one of the best way to keep the url's aliases short as well as unique.
 
 **Solution for number 3:**
+
 Our system would be read heavy, means there would be a lot people use our site for converting long url to short url instead of generating short from a long one, per second. I keep that thing in my mind while designing the solutions. 
 
 I divided the whole solutions in 2 parts and created two microservices for that. They are:
@@ -30,11 +31,12 @@ There responsibilities are very simple. let's discuss about that.
 
 1. Key Range provider service: It's a rest api. It has only one GET endpoint. If any consumer request that endpoint it provides a range of two numbers. For example: let's have a look on the service's GET response,
 
-  {
+{
     "range_id": 29,
     "start_range": 9000001,
     "end_range": 10000000
-  }
+}
+
 
 - start_range = range start point
 - end_range = range end point
@@ -49,7 +51,20 @@ Service-1 High Level Architecture: http://localhost:4000
 
 
 
-2. **Url distribution service:** This service has only url distribution responsibility, either it could be after converting short to long or long to short url. It has a background service that pull key ranges from Key Range Provider Service and store that in a concurrent queue and check every 5 sec that if the queue has enough items. While monitoring if it find that queue is empty then the background service pulls another set of key range and enque the concurrent queue. When user comes to convert a long url to short that time rest api safely deque an item from the concurrent queue and generates an unique url and provides to user. The concurrent queue ensure that every long to short url request on server get the unique value. 
+
+
+
+2. **Url distribution service:** 
+
+This service has only url distribution responsibility, either it could be after converting short to long or long to short url. let's talk about long to short url conversion process first, this process represents about write data. 
+
+The Url distribution service has a background service that pulls key ranges from "Key Range Provider Service" and store that in a concurrent queue and check every 5 sec that if the queue has enough items or not. While monitoring if it's find that, the queue is empty then the background service pulls another set of key range and enque the concurrent queue. When user comes to convert a long url to short that time rest api safely deque an item from the concurrent queue and generates an unique url and provides to user. The concurrent queue ensure that every long to short url request on server gets the unique value for url aliases. 
+
+Now let talk about read data or short to long conversion process. 
+
+
+
+
 
 
 
