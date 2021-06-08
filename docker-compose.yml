@@ -129,6 +129,7 @@ services:
             - seq
             - mongo1
             - redis-master
+            - nginx
 
     
             

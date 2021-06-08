@@ -64,7 +64,7 @@ namespace HelloShortly.UrlDistributerRestApi.BackgroundServices
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogInformation("Failed to get keygen range.");
+                        _logger.LogInformation("Failed to get keygen range. -> " + ex.Message);
                     }
                 }
 
