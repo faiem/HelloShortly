@@ -63,6 +63,8 @@ The Url distribution service has a background service that pulls key ranges from
 Now let talk about read data or short to long conversion process. In this process user provides our server generated short url and expect the original long url. After receiving the short url from user, service first check to the cache, if it found that in there then return the long url from there. But if the service does not get it on cache server then it will check the Mongo DB storage, if found then return it otherwise declare that the short aliases was not produced by our system.
 
 
+Service-2 High Level Architecture: http://localhost:5000
+
 ![service_2_HLA](https://user-images.githubusercontent.com/5144847/121208879-41546480-c82f-11eb-8736-05db6054dd44.png)
 
 
