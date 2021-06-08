@@ -65,7 +65,7 @@ services:
             - my-network  
             
     #Load balancer for Key Range Service Provider
-    nginx:
+    key-range-provider_lb:
         image: nginx:latest
         restart: on-failure
         volumes:
@@ -77,81 +77,119 @@ services:
         networks:
             - my-network
 
-    mongo1:
-        hostname: mongo1
-        container_name: localmongo1
-        image: mongo:4.0-xenial
-        expose:
-            - 27017
-        restart: always
-        entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+    # mongo1:
+    #     hostname: mongo1
+    #     container_name: localmongo1
+    #     image: mongo:4.0-xenial
+    #     expose:
+    #         - 27017
+    #     restart: always
+    #     entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
 
-    mongo2:
-        hostname: mongo2
-        container_name: localmongo2
-        image: mongo:4.0-xenial
-        expose:
-            - 27017
-        restart: always
-        entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+    # mongo2:
+    #     hostname: mongo2
+    #     container_name: localmongo2
+    #     image: mongo:4.0-xenial
+    #     expose:
+    #         - 27017
+    #     restart: always
+    #     entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
 
-    mongo3:
-        hostname: mongo3
-        container_name: localmongo3
-        image: mongo:4.0-xenial
-        expose:
-            - 27017
-        restart: always
-        entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+    # mongo3:
+    #     hostname: mongo3
+    #     container_name: localmongo3
+    #     image: mongo:4.0-xenial
+    #     expose:
+    #         - 27017
+    #     restart: always
+    #     entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
 
-    mongosetup:
-        image: mongo:4.0-xenial
-        depends_on:
-            - mongo1
-            - mongo2
-            - mongo3
-        volumes:
-            - ./MongoClusterConfig/mongo_setup.sh:/etc/scripts
-        restart: "no"
-        entrypoint: [ "bash", "/etc/scripts/mongo_setup.sh"]
+    # mongosetup:
+    #     image: mongo:4.0-xenial
+    #     depends_on:
+    #         - mongo1
+    #         - mongo2
+    #         - mongo3
+    #     volumes:
+    #         - ./MongoClusterConfig/mongo_setup.sh:/etc/scripts
+    #     restart: "no"
+    #     entrypoint: [ "bash", "/etc/scripts/mongo_setup.sh"]
+
+    mongo_db:
+        image: 'mongo'
+        container_name: 'my-mongo-container'
+        environment: 
+            - "MONGO_INITDB_DATABASE=short_urls"
+            - "MONGO_INITDB_ROOT_USERNAME=mongo_root"
+            - "MONGO_INITDB_ROOT_PASSWORD=secret"
+        volumes: 
+            - ./MongoDbConfig/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+            - ./mongo-volume:/data/db
+        ports:
+            - '27017-27019:27017-27019'
+        networks: 
+            - my-network
 
     redis-master:
-        hostname: redis-master
-        image: bitnami/redis:latest
-        restart: unless-stopped
-        volumes: 
-            - ./data:/bitnami
-        ports: 
-            - '6379:6379'
-        environment: 
-            - "REDIS_REPLICATION_MODE=master"
-            - "ALLOW_EMPTY_PASSWORD=yes"
+        image: 'bitnami/redis:latest'
+        ports:
+          - '6379'
+        environment:
+          - REDIS_REPLICATION_MODE=master
+          - REDIS_PASSWORD=my_master_password
+        volumes:
+          - './redis-persistence:/bitnami'
         networks:
-            - my-network
+          - my-network
+    
+    redis-replica:
+        image: 'bitnami/redis:latest'
+        ports:
+          - '6379'
+        depends_on:
+          - redis-master
+        environment:
+          - REDIS_REPLICATION_MODE=slave
+          - REDIS_MASTER_HOST=redis-master
+          - REDIS_MASTER_PORT_NUMBER=6379
+          - REDIS_MASTER_PASSWORD=my_master_password
+          - REDIS_PASSWORD=my_replica_password   
+        networks:
+            - my-network 
             
     url_distributer:
         build: ./HelloShortly.UrlDistributerSolutions/HelloShortly.UrlDistributerRestApi/
         restart: on-failure
-        ports: 
-            - 6090:80
+        expose: 
+            - "80"
         environment:
             - "ASPNETCORE_LOG_HOST=http://seq:5341"
-            - "KEY_RANGE_GET_API=http://nginx:4000/KeyRanges"
-            - "MONGO_CONN=mongodb://localmongo1,localmongo2,localmongo3/short_urls?replicaSet=rs0"
+            - "KEY_RANGE_GET_API=http://key-range-provider_lb:4000/KeyRanges"
+            - "MONGO_CONN=mongodb://secret_user:secret_password@mongo_db:27017/short_urls"
             - "MONGO_DB_NAME=short_urls"
             - "Mongo_COLLECTION_NAME=urls"
-            - "REDIS_CONN=redis-master:6379" 
-            - "LOAD_BALANCER=http://localhost:5050/"
+            - "REDIS_CONN=redis-master:6379,password=my_master_password" 
+            - "LOAD_BALANCER=http://localhost:5000/"
         depends_on:
             - seq
             - redis-master
-            - nginx
+            - key-range-provider_lb
+            - mongo_db
         networks:
             - my-network
-        external_links:
-            - "localmongo1:mongo1"
-            - "localmongo2:mongo2"
-            - "localmongo3:mongo3"
+
+    url_distributer_lb:
+        image: nginx:latest
+        restart: on-failure
+        volumes:
+            - ./UrlDistributionLBConfig/nginx.conf:/etc/nginx/nginx.conf:ro
+        depends_on:
+            - key-range-provider
+        ports:
+            - "5000:8080" 
+        networks:
+            - my-network
+
 
 networks:
     my-network:

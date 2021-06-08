@@ -102,7 +102,7 @@ namespace HelloShortly.UrlDistributerRestApi.Controllers
 
             //Add to cache
             await _cacheService.SetCacheValueAsync(shortUrlResponse.ShortUrlAliases, shortUrlResponse.LongUrl);
-            return StatusCode(201, shortUrlResponse.ShortUrl);
+            return StatusCode(201, shortUrlResponse);
         }
     }
 }

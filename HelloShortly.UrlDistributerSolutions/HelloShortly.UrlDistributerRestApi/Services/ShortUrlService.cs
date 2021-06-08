@@ -46,7 +46,7 @@ namespace HelloShortly.UrlDistributerRestApi.Services
 
             shortAliases = _base62Generator.Encode(unique_number);
 
-            if (string.IsNullOrEmpty(customHostedName))
+            if (string.IsNullOrEmpty(customHostedName) || customHostedName=="string")
             {
                 //_logger.LogInformation(Environment.GetEnvironmentVariable("LOAD_BALANCER"));
                 customHostedName = Environment.GetEnvironmentVariable("LOAD_BALANCER");
