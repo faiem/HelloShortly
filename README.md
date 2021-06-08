@@ -66,6 +66,15 @@ High Level Architecture for Service-2: http://localhost:5000/swagger
 
 ![service_2_HLA_2](https://user-images.githubusercontent.com/5144847/121219859-f5a6b880-c838-11eb-9a5f-5d024a75009a.png)
 
+# Usage Instructions:
+
+1. Please Run the docker-compose.yml file at project root directory, `docker-compose up --scale key-range-provider=3 --scale url_distributer=5` For the first time run it takes around 10 minutes to be prepare. The key-range-provider service generates key ranges through sql, that's why it takes some time for preparing data.
+2. For checking log, please find `http://localhost:5341`
+3. For Url_distributor_service load balancer. please find `http://localhost:5000/swagger`
+4. For Key-range-provider service load balancer, please find `http://localhost:4000` 
+
+If you have any questions, Please don't hasitate to knock me at faiem.ict@gmail.com. Thank you.
+
 
 
 
