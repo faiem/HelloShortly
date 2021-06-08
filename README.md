@@ -29,7 +29,7 @@ I divided the whole solutions in 2 parts and created two microservices for that.
 
 There responsibilities are very simple. let's discuss about that.
 
-1. Key Range provider service: It's a rest api. It has only one GET endpoint. If any consumer request that endpoint it provides a range of two numbers. For example: let's have a look on the service's GET response,
+1. Key Range provider service: It's a rest api. It has only one GET endpoint. If any consumer request that endpoint it provides a range of two numbers. For example: let's have a look on the service's a sample GET json response,
 
 {
     "range_id": 29,
@@ -58,10 +58,12 @@ Service-1 High Level Architecture: http://localhost:4000
 
 This service has only url distribution responsibility, either it could be after converting short to long or long to short url. let's talk about long to short url conversion process first, this process represents about write data. 
 
-The Url distribution service has a background service that pulls key ranges from "Key Range Provider Service" and store that in a concurrent queue and check every 5 sec that if the queue has enough items or not. While monitoring if it's find that, the queue is empty then the background service pulls another set of key range and enque the concurrent queue. When user comes to convert a long url to short that time rest api safely deque an item from the concurrent queue and generates an unique url and provides to user. The concurrent queue ensure that every long to short url request on server gets the unique value for url aliases. 
+The Url distribution service has a background service that pulls key ranges from "Key Range Provider Service" and store that in a concurrent queue and check every 5 sec that if the queue has enough items or not. While monitoring if it's find that, the queue is empty then the background service pulls another set of key range and enque the concurrent queue. When user comes to convert a long url to short that time rest api safely deque an item from the concurrent queue and generates an unique url and provides to user. The concurrent queue ensure that every long to short url request on server gets the unique value for url aliases. We stored a copy to our Mongo Db data storage for future read operations. Moreover after converting long to short url, the service store that output to a cache server, so the read operation could find and serve it fast.
 
-Now let talk about read data or short to long conversion process. 
+Now let talk about read data or short to long conversion process. In this process user provides our server generated short url and expect the original long url. After receiving the short url from user, service first check to the cache, if it found that in there then return the long url from there. But if the service does not get it on cache server then it will check the Mongo DB storage, if found then return it otherwise declare that the short aliases was not produced by our system.
 
+
+![service_2_HLA](https://user-images.githubusercontent.com/5144847/121208879-41546480-c82f-11eb-8736-05db6054dd44.png)
 
 
 
