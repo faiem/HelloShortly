@@ -54,6 +54,7 @@ namespace HelloShortly.UrlDistributerRestApi.Controllers
                 return Ok(new { longUrl = cacheResult });
             }
 
+            //then check at the mongo_db storage
             var long_url = _shortUrlService.GetLongUrl(aliases);
 
             if (string.IsNullOrEmpty(long_url))

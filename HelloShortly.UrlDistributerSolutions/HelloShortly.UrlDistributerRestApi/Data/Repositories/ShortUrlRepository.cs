@@ -16,12 +16,16 @@ namespace HelloShortly.UrlDistributerRestApi.Data.Repositories
         public ShortUrlRepository(ILogger<ShortUrlRepository> logger)
         {
             _logger = logger;
+            
+            //_logger.LogWarning(Environment.GetEnvironmentVariable("MONGO_CONN"));
+            //_logger.LogWarning(Environment.GetEnvironmentVariable("MONGO_DB_NAME"));
+            //_logger.LogWarning(Environment.GetEnvironmentVariable("Mongo_COLLECTION_NAME"));
+
             var client = new MongoClient(Environment.GetEnvironmentVariable("MONGO_CONN"));
             var database = client.GetDatabase(Environment.GetEnvironmentVariable("MONGO_DB_NAME"));
             _shortUrls = database.GetCollection<ShortUrl>(Environment.GetEnvironmentVariable("Mongo_COLLECTION_NAME"));
 
-            _logger.LogInformation(Environment.GetEnvironmentVariable("MONGO_CONN"));
-            _logger.LogInformation(Environment.GetEnvironmentVariable("MONGO_DB_NAME"));
+            
         }
 
         public ShortUrl Create(ShortUrl url)

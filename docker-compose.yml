@@ -11,38 +11,44 @@ services:
             ACCEPT_EULA: Y
         restart: unless-stopped
         volumes: 
-            - ./seq-data:/data 
+            - ./seq-data:/data
+        networks:
+            - my-network
     
     postgresql-master:
         image: 'bitnami/postgresql:latest'
         restart: 'on-failure'
         ports:
-        - '5432'
+            - '5432'
         volumes:
-        - './postgresql_master_data:/bitnami/postgresql'
-        - './KeyRangeGeneratorSQL/create_table.sql:/docker-entrypoint-initdb.d/create_tables.sql'
-        - './KeyRangeGeneratorSQL/fill_table.sql:/docker-entrypoint-initdb.d/fill_tables.sql'
+            - './postgresql_master_data:/bitnami/postgresql'
+            - './KeyRangeGeneratorSQL/create_table.sql:/docker-entrypoint-initdb.d/create_tables.sql'
+            - './KeyRangeGeneratorSQL/fill_table.sql:/docker-entrypoint-initdb.d/fill_tables.sql'
         environment:
-        - POSTGRESQL_REPLICATION_MODE=master
-        - POSTGRESQL_REPLICATION_USER=repl_user
-        - POSTGRESQL_REPLICATION_PASSWORD=repl_password
-        - POSTGRESQL_USERNAME=my_user
-        - POSTGRESQL_PASSWORD=my_password
-        - POSTGRESQL_DATABASE=my_database
+            - POSTGRESQL_REPLICATION_MODE=master
+            - POSTGRESQL_REPLICATION_USER=repl_user
+            - POSTGRESQL_REPLICATION_PASSWORD=repl_password
+            - POSTGRESQL_USERNAME=my_user
+            - POSTGRESQL_PASSWORD=my_password
+            - POSTGRESQL_DATABASE=my_database
+        networks:
+            - my-network
       
     postgresql-slave:
         image: 'bitnami/postgresql:latest'
         ports:
-        - '5432'
+            - '5432'
         depends_on:
-        - postgresql-master
+            - postgresql-master
         environment:
-        - POSTGRESQL_REPLICATION_MODE=slave
-        - POSTGRESQL_REPLICATION_USER=repl_user
-        - POSTGRESQL_REPLICATION_PASSWORD=repl_password
-        - POSTGRESQL_MASTER_HOST=postgresql-master
-        - POSTGRESQL_PASSWORD=my_password
-        - POSTGRESQL_MASTER_PORT_NUMBER=5432  
+            - POSTGRESQL_REPLICATION_MODE=slave
+            - POSTGRESQL_REPLICATION_USER=repl_user
+            - POSTGRESQL_REPLICATION_PASSWORD=repl_password
+            - POSTGRESQL_MASTER_HOST=postgresql-master
+            - POSTGRESQL_PASSWORD=my_password
+            - POSTGRESQL_MASTER_PORT_NUMBER=5432
+        networks:
+            - my-network
     
     key-range-provider:
         environment:
@@ -52,20 +58,24 @@ services:
         restart: unless-stopped
         expose: 
             - "80"
-        links:
+        depends_on:
             - seq
-            - postgresql-master   
+            - postgresql-master
+        networks:
+            - my-network  
             
     #Load balancer for Key Range Service Provider
     nginx:
         image: nginx:latest
         restart: on-failure
         volumes:
-          - ./KeyRangeServiceLoadBalancerConfig/nginx.conf:/etc/nginx/nginx.conf:ro
+            - ./KeyRangeServiceLoadBalancerConfig/nginx.conf:/etc/nginx/nginx.conf:ro
         depends_on:
-          - key-range-provider
+            - key-range-provider
         ports:
-          - "4000:4000" 
+            - "4000:4000" 
+        networks:
+            - my-network
 
     mongo1:
         hostname: mongo1
@@ -77,6 +87,8 @@ services:
             - 27011:27017
         restart: unless-stopped
         entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+        networks:
+            - my-network
 
     mongo2:
         hostname: mongo2
@@ -88,6 +100,8 @@ services:
             - 27012:27017
         restart: unless-stopped
         entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+        networks:
+            - my-network
 
     mongo3:
         hostname: mongo3
@@ -99,6 +113,8 @@ services:
             - 27013:27017
         restart: unless-stopped
         entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+        networks:
+            - my-network
     
     redis-master:
         hostname: redis-master
@@ -111,6 +127,8 @@ services:
         environment: 
             - "REDIS_REPLICATION_MODE=master"
             - "ALLOW_EMPTY_PASSWORD=yes"
+        networks:
+            - my-network
             
     url_distributer:
         build: ./HelloShortly.UrlDistributerSolutions/HelloShortly.UrlDistributerRestApi/
@@ -119,22 +137,27 @@ services:
             - 6090:80
         environment:
             - "ASPNETCORE_LOG_HOST=http://seq:5341"
-            - "KEY_RANGE_GET_API=http://localhost:4000/KeyRanges"
-            - "MONGO_CONN=mongodb://localhost:27011/short_urls"
+            - "KEY_RANGE_GET_API=http://nginx:4000/KeyRanges"
+            - "MONGO_CONN=mongodb://mongo1:27011/short_urls"
             - "MONGO_DB_NAME=short_urls"
-            #- "Mongo_COLLECTION_NAME="
-            - "REDIS_CONN=localhost:6379" 
-            - "LOAD_BALANCER=http://localhost:8080/"
-        links:
+            - "Mongo_COLLECTION_NAME=urls"
+            - "REDIS_CONN=redis-master:6379" 
+            - "LOAD_BALANCER=http://localhost:5050/"
+        depends_on:
             - seq
             - mongo1
             - redis-master
             - nginx
+        networks:
+            - my-network
 
-    
+networks:
+    my-network:
+        #driver: bridge
+        external: true
             
 
-    #Load balancer for Key Range Service Provider
+
     
             
 

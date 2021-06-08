@@ -48,8 +48,8 @@ namespace HelloShortly.UrlDistributerRestApi.Services
 
             if (string.IsNullOrEmpty(customHostedName))
             {
+                //_logger.LogInformation(Environment.GetEnvironmentVariable("LOAD_BALANCER"));
                 customHostedName = Environment.GetEnvironmentVariable("LOAD_BALANCER");
-                //_logger.LogInformation($"customHostedName became {customHostedName}");
             }
 
             ShortUrl su = new()
@@ -63,7 +63,7 @@ namespace HelloShortly.UrlDistributerRestApi.Services
                 UserId = null
             };
 
-            //_shortUrlRepository.Create(su);
+            _shortUrlRepository.Create(su);
 
             ShortUrlResponse response = new()
             {

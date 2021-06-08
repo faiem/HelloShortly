@@ -4,3 +4,5 @@
 /postgresql_master_data
 /HelloShortly.UrlDistributerSolutions/HelloShortly.UrlDistributerRestApi/bin
 /HelloShortly.UrlDistributerSolutions/HelloShortly.UrlDistributerRestApi/obj
+/data
+/dataSlave
